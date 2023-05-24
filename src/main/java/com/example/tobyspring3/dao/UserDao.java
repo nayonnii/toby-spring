@@ -7,30 +7,25 @@ import java.util.Map;
 
 import static java.lang.System.getenv;
 
-public class UserDao {
-    public Connection getConnection() throws ClassNotFoundException, SQLException {
-        Map<String, String> env = getenv();
-        String dbHost = env.get("DB_HOST");
-        String dbUser = env.get("DB_USER");
-        String dbPassword = env.get("DB_PASSWORD");
+public abstract class UserDao {
 
-        Class.forName("com.mysql.cj.jdbc.Driver");
-        Connection conn = DriverManager.getConnection(dbHost, dbUser, dbPassword);
+    public abstract Connection getConnection() throws ClassNotFoundException, SQLException;
 
-        return conn;
-    }
-
-
-    public void add(User user) throws ClassNotFoundException, SQLException {
-          Connection conn = getConnection();
-
+//    public Connection getConnection() throws ClassNotFoundException, SQLException {
 //        Map<String, String> env = getenv();
 //        String dbHost = env.get("DB_HOST");
 //        String dbUser = env.get("DB_USER");
 //        String dbPassword = env.get("DB_PASSWORD");
 //
-//        Class.forName("com.mysql.cj.jdbc.Driver"); // 신 버전에는 cj가 들어감(책엔 없음)
+//        Class.forName("com.mysql.cj.jdbc.Driver");
 //        Connection conn = DriverManager.getConnection(dbHost, dbUser, dbPassword);
+//
+//        return conn;
+//    }
+
+
+    public void add(User user) throws ClassNotFoundException, SQLException {
+          Connection conn = getConnection();
 
         PreparedStatement pstmt = conn.prepareStatement("insert into users(id, name, password) values (?, ? ,?)");
         pstmt.setString(1, user.getId());
@@ -45,13 +40,6 @@ public class UserDao {
 
     public User get(String id) throws ClassNotFoundException, SQLException {
           Connection conn = getConnection();
-//        Map<String, String> env = getenv();
-//        String dbHost = env.get("DB_HOST");
-//        String dbUser = env.get("DB_USER");
-//        String dbPassword = env.get("DB_PASSWORD");
-//
-//        Class.forName("com.mysql.cj.jdbc.Driver");
-//        Connection conn = DriverManager.getConnection(dbHost, dbUser, dbPassword);
 
         PreparedStatement pstmt = conn.prepareStatement("select id, name, password from users where id = ?");    // 모든 걸 호출하더라도 컬럼명을 써주는 게 좋음
         pstmt.setString(1, id);
@@ -72,14 +60,14 @@ public class UserDao {
     }
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        UserDao userDao = new UserDao();
+        UserDao userDao = new NUserDao();
         User user = new User();
-        user.setId("1");
-        user.setName("sunghan");
+        user.setId("2");
+        user.setName("jihoon");
         user.setPassword("123456");
         userDao.add(user);
 
-        User selectedUser = userDao.get("1");
+        User selectedUser = userDao.get("2");
         System.out.println(selectedUser.getId());
         System.out.println(selectedUser.getName());
         System.out.println(selectedUser.getPassword());
